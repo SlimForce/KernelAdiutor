@@ -219,12 +219,12 @@ public class CPU implements Constants {
     }
 
     public static void setGovernor(String governor, Context context) {
-        Control.runCommand(governor, CPU_SCALING_GOVERNOR, Control.CommandType.CPU, context);
+        Control.runCommand(governor, Utils.CPU_SCALING_GOVERNOR, Control.CommandType.CPU, context);
     }
 
     public static String getCurGovernor(int core) {
-        if (Utils.existFile(String.format(CPU_SCALING_GOVERNOR, core))) {
-            String value = Utils.readFile(String.format(CPU_SCALING_GOVERNOR, core));
+        if (Utils.existFile(String.format(Utils.CPU_SCALING_GOVERNOR, core))) {
+            String value = Utils.readFile(String.format(Utils.CPU_SCALING_GOVERNOR, core));
             if (value != null) return value;
         }
         return "";
@@ -263,52 +263,52 @@ public class CPU implements Constants {
     }
 
     public static void setMaxScreenOffFreq(int freq, Context context) {
-        Control.runCommand(String.valueOf(freq), CPU_MAX_SCREEN_OFF_FREQ, Control.CommandType.CPU, context);
+        Control.runCommand(String.valueOf(freq), Utils.CPU_MAX_SCREEN_OFF_FREQ, Control.CommandType.CPU, context);
     }
 
     public static int getMaxScreenOffFreq(int core) {
-        if (Utils.existFile(String.format(CPU_MAX_SCREEN_OFF_FREQ, core))) {
-            String value = Utils.readFile(String.format(CPU_MAX_SCREEN_OFF_FREQ, core));
+        if (Utils.existFile(String.format(Utils.CPU_MAX_SCREEN_OFF_FREQ, core))) {
+            String value = Utils.readFile(String.format(Utils.CPU_MAX_SCREEN_OFF_FREQ, core));
             if (value != null) return Utils.stringToInt(value);
         }
         return 0;
     }
 
     public static boolean hasMaxScreenOffFreq() {
-        return Utils.existFile(String.format(CPU_MAX_SCREEN_OFF_FREQ, 0));
+        return Utils.existFile(String.format(Utils.CPU_MAX_SCREEN_OFF_FREQ, 0));
     }
 
     public static void setMinFreq(int freq, Context context) {
         if (getMaxFreq(0) < freq) setMaxFreq(freq, context);
-        Control.runCommand(String.valueOf(freq), CPU_MIN_FREQ, Control.CommandType.CPU, context);
+        Control.runCommand(String.valueOf(freq), Utils.CPU_MIN_FREQ, Control.CommandType.CPU, context);
     }
 
     public static int getMinFreq(int core) {
-        if (Utils.existFile(String.format(CPU_MIN_FREQ, core))) {
-            String value = Utils.readFile(String.format(CPU_MIN_FREQ, core));
+        if (Utils.existFile(String.format(Utils.CPU_MIN_FREQ, core))) {
+            String value = Utils.readFile(String.format(Utils.CPU_MIN_FREQ, core));
             if (value != null) return Utils.stringToInt(value);
         }
         return 0;
     }
 
     public static void setMaxFreq(int freq, Context context) {
-        if (Utils.existFile(CPU_MSM_CPUFREQ_LIMIT))
-            Control.runCommand(String.valueOf(freq), CPU_MSM_CPUFREQ_LIMIT, Control.CommandType.GENERIC, context);
+        if (Utils.existFile(Utils.CPU_MSM_CPUFREQ_LIMIT))
+            Control.runCommand(String.valueOf(freq), Utils.CPU_MSM_CPUFREQ_LIMIT, Control.CommandType.GENERIC, context);
         if (getMinFreq(0) > freq) setMinFreq(freq, context);
-        Control.runCommand(String.valueOf(freq), CPU_MAX_FREQ, Control.CommandType.CPU, context);
+        Control.runCommand(String.valueOf(freq), Utils.CPU_MAX_FREQ, Control.CommandType.CPU, context);
     }
 
     public static int getMaxFreq(int core) {
-        if (Utils.existFile(String.format(CPU_MAX_FREQ, core))) {
-            String value = Utils.readFile(String.format(CPU_MAX_FREQ, core));
+        if (Utils.existFile(String.format(Utils.CPU_MAX_FREQ, core))) {
+            String value = Utils.readFile(String.format(Utils.CPU_MAX_FREQ, core));
             if (value != null) return Utils.stringToInt(value);
         }
         return 0;
     }
 
     public static int getCurFreq(int core) {
-        if (Utils.existFile(String.format(CPU_CUR_FREQ, core))) {
-            String value = Utils.readFile(String.format(CPU_CUR_FREQ, core));
+        if (Utils.existFile(String.format(Utils.CPU_CUR_FREQ, core))) {
+            String value = Utils.readFile(String.format(Utils.CPU_CUR_FREQ, core));
             if (value != null) return Utils.stringToInt(value);
         }
         return 0;

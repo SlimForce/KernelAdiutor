@@ -351,7 +351,7 @@ public class CPUHotplug implements Constants {
     }
 
     public static boolean hasMakoHotplugSuspendFreq() {
-        return !Utils.existFile(CPU_MAX_SCREEN_OFF_FREQ) && Utils.existFile(MAKO_HOTPLUG_SUSPEND_FREQ);
+        return !Utils.existFile(Utils.CPU_MAX_SCREEN_OFF_FREQ) && Utils.existFile(MAKO_HOTPLUG_SUSPEND_FREQ);
     }
 
     public static void setMakoHotplugTimer(int value, Context context) {
@@ -487,7 +487,7 @@ public class CPUHotplug implements Constants {
     }
 
     public static boolean hasMsmHotplugSuspendFreq() {
-        if (!Utils.existFile(CPU_MAX_SCREEN_OFF_FREQ))
+        if (!Utils.existFile(Utils.CPU_MAX_SCREEN_OFF_FREQ))
             if (Utils.existFile(HOTPLUG_MSM_SUSPEND_FREQ)) {
                 MSM_HOTPLUG_SUSPEND_FREQ_FILE = HOTPLUG_MSM_SUSPEND_FREQ;
             } else if (Utils.existFile(HOTPLUG_MSM_SUSPEND_MAX_FREQ))
@@ -738,7 +738,7 @@ public class CPUHotplug implements Constants {
     }
 
     public static boolean hasBluPlugMaxFreqScreenOff() {
-        return !Utils.existFile(CPU_MAX_SCREEN_OFF_FREQ) && Utils.existFile(HOTPLUG_BLU_PLUG_MAX_FREQ_SCREEN_OFF);
+        return !Utils.existFile(Utils.CPU_MAX_SCREEN_OFF_FREQ) && Utils.existFile(HOTPLUG_BLU_PLUG_MAX_FREQ_SCREEN_OFF);
     }
 
     public static void setBluPlugMaxCoresScreenOff(int value, Context context) {
@@ -956,7 +956,7 @@ public class CPUHotplug implements Constants {
     }
 
     public static boolean hasIntelliPlugScreenOffMax() {
-        if (Utils.existFile(CPU_MAX_SCREEN_OFF_FREQ)) return false;
+        if (Utils.existFile(Utils.CPU_MAX_SCREEN_OFF_FREQ)) return false;
         String file = HOTPLUG_INTELLI_PLUG_SCREEN_OFF_MAX;
         if (TYPE == INTELLIPLUG_TYPE.INTELLIPLUG_5) file = HOTPLUG_INTELLI_PLUG_5_SCREEN_OFF_MAX;
         return Utils.existFile(file);

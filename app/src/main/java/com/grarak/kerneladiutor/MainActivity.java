@@ -241,7 +241,7 @@ public class MainActivity extends ActionBarActivity implements Constants {
 
             if (hasRoot && hasBusybox) {
                 RootUtils.su = new RootUtils.SU();
-
+				Utils.checkMsmLimiter();
                 String[] writePermission = {LMK_MINFREE};
                 for (String file : writePermission)
                     RootUtils.runCommand("chmod 644 " + file);

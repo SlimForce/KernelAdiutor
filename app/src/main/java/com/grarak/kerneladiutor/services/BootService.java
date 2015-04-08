@@ -140,6 +140,7 @@ public class BootService extends Service {
         sysDB.create();
 
         RootUtils.SU su = new RootUtils.SU();
+		Utils.checkMsmLimiter();
 
         String[] writePermission = {Constants.LMK_MINFREE};
         for (String file : writePermission)

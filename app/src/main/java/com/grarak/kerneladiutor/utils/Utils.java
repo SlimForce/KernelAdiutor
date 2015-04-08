@@ -60,7 +60,37 @@ import java.util.Locale;
 public class Utils implements Constants {
 
     public static boolean DARKTHEME = false;
-
+	
+    private static boolean MSM_LIMITER_INITED = false;
+    private static String CPU_MSM_LIMITER = "/sys/kernel/msm_limiter/limiter_enabled" ;
+    public static String CPU_CUR_FREQ = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_cur_freq";
+    public static String CPU_MAX_FREQ = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_max_freq";
+    public static String CPU_MIN_FREQ = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_min_freq";
+    public static String CPU_MAX_SCREEN_OFF_FREQ = "/sys/devices/system/cpu/cpu%d/cpufreq/screen_off_max_freq";
+    public static String CPU_MSM_CPUFREQ_LIMIT = "/sys/kernel/msm_cpufreq_limit/cpufreq_limit";
+    public static String CPU_SCALING_GOVERNOR = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_governor";
+    private static String[][] CPU_ARRAY = {{CPU_CUR_FREQ, CPU_CORE_ONLINE, CPU_MAX_FREQ, CPU_MIN_FREQ, CPU_MAX_SCREEN_OFF_FREQ,
+            				CPU_MSM_CPUFREQ_LIMIT, CPU_AVAILABLE_FREQS, CPU_TIME_STATE, CPU_SCALING_GOVERNOR, CPU_AVAILABLE_GOVERNORS,
+            				CPU_GOVERNOR_TUNABLES, CPU_MC_POWER_SAVING, CPU_AVAILABLE_CFS_SCHEDULERS, CPU_CURRENT_CFS_SCHEDULER},
+            				CPU_TEMP_LIMIT_ARRAY, CPU_BOOST_ARRAY} ;
+    public static void checkMsmLimiter() {
+		if( MSM_LIMITER_INITED ) {
+			return ;
+		}
+		MSM_LIMITER_INITED	= true ;
+		if( existFile(CPU_MSM_LIMITER) ) {
+			CPU_MAX_FREQ = "/sys/kernel/msm_limiter/resume_max_freq_%d";
+			CPU_MIN_FREQ = "/sys/kernel/msm_limiter/suspend_min_freq_%d";
+			CPU_MAX_SCREEN_OFF_FREQ = "/sys/kernel/msm_limiter/suspend_max_freq";
+			CPU_MSM_CPUFREQ_LIMIT = "/sys/kernel/msm_limiter/limiter_enabled";
+			CPU_SCALING_GOVERNOR = "/sys/kernel/msm_limiter/scaling_governor_%d";
+			CPU_ARRAY =	new  String[][]{ new  String[]{CPU_CUR_FREQ, CPU_CORE_ONLINE, CPU_MAX_FREQ, CPU_MIN_FREQ, CPU_MAX_SCREEN_OFF_FREQ,
+            				CPU_MSM_CPUFREQ_LIMIT, CPU_AVAILABLE_FREQS, CPU_TIME_STATE, CPU_SCALING_GOVERNOR, CPU_AVAILABLE_GOVERNORS,
+            				CPU_GOVERNOR_TUNABLES, CPU_MC_POWER_SAVING, CPU_AVAILABLE_CFS_SCHEDULERS, CPU_CURRENT_CFS_SCHEDULER},
+            				CPU_TEMP_LIMIT_ARRAY, CPU_BOOST_ARRAY} ;
+		}
+	}
+	
     public static String readAssetFile(Context context, String file) {
         BufferedReader in = null;
         try {
