@@ -16,7 +16,6 @@
 
 package com.grarak.kerneladiutor.fragments;
 
-import android.app.Fragment;
 import android.content.res.Configuration;
 import android.graphics.LightingColorFilter;
 import android.os.AsyncTask;
@@ -34,8 +33,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 
+import com.grarak.kerneladiutor.MainActivity;
 import com.grarak.kerneladiutor.R;
 import com.grarak.kerneladiutor.elements.DAdapter;
 import com.grarak.kerneladiutor.utils.Constants;
@@ -53,8 +52,7 @@ interface IRecyclerView {
 /**
  * Created by willi on 22.12.14.
  */
-public abstract class RecyclerViewFragment extends Fragment implements IRecyclerView {
-
+public abstract class RecyclerViewFragment extends BaseFragment implements IRecyclerView {
     protected View view;
     protected LayoutInflater inflater;
     protected ViewGroup container;
@@ -93,7 +91,6 @@ public abstract class RecyclerViewFragment extends Fragment implements IRecycler
             }
         });
         setRecyclerView(recyclerView);
-        setLayout();
         recyclerView.setPadding(5, 5, 5, 5);
 
         progressBar = new ProgressBar(getActivity());
@@ -168,7 +165,7 @@ public abstract class RecyclerViewFragment extends Fragment implements IRecycler
     public void removeView(DAdapter.DView view) {
         int position = views.indexOf(view);
         if (position > -1) {
-            views.remove(view);
+            views.remove(position);
             adapter.notifyDataSetChanged();
         }
     }
@@ -197,16 +194,7 @@ public abstract class RecyclerViewFragment extends Fragment implements IRecycler
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
-        setLayout();
         layoutManager.setSpanCount(getSpan());
-    }
-
-    private void setLayout() {
-        if (applyOnBootLayout != null) {
-            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) applyOnBootLayout.getLayoutParams();
-            layoutParams.height = Utils.getActionBarHeight(getActivity());
-            applyOnBootLayout.requestLayout();
-        }
     }
 
     public ActionBar getActionBar() {
@@ -218,8 +206,11 @@ public abstract class RecyclerViewFragment extends Fragment implements IRecycler
     }
 
     public void showApplyOnBoot(boolean visible) {
-        getParentView(R.layout.recyclerview_vertical).findViewById(R.id.apply_on_boot_layout).setVisibility(
-                visible ? View.VISIBLE : View.GONE);
+        try {
+            getParentView(R.layout.recyclerview_vertical).findViewById(R.id.apply_on_boot_layout).setVisibility(
+                    visible ? View.VISIBLE : View.GONE);
+        } catch (NullPointerException ignored) {
+        }
     }
 
     public int getSpan() {
@@ -252,6 +243,11 @@ public abstract class RecyclerViewFragment extends Fragment implements IRecycler
     public void onDestroy() {
         super.onDestroy();
         if (hand != null) hand.removeCallbacks(run);
+    }
+
+    @Override
+    public boolean onBackPressed() {
+        return false;
     }
 
     private class CardViewTask extends AsyncTask<Bundle, Bundle, Bundle> {
@@ -295,8 +291,7 @@ public abstract class RecyclerViewFragment extends Fragment implements IRecycler
 
             try {
                 ((ViewGroup) progressBar.getParent()).removeView(progressBar);
-            } catch (NullPointerException e) {
-                e.printStackTrace();
+            } catch (NullPointerException ignored) {
             }
             try {
                 if (isAdded()) postInitCardView(savedInstanceState);

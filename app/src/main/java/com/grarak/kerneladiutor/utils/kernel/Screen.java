@@ -24,7 +24,6 @@ import com.grarak.kerneladiutor.utils.Utils;
 import com.grarak.kerneladiutor.utils.root.Control;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -389,6 +388,18 @@ public class Screen implements Constants {
         return false;
     }
 
+    public static void activateScreenHBM(boolean active, Context context) {
+        Control.runCommand(active ? "1" : "0", SCREEN_HBM, Control.CommandType.GENERIC, context);
+    }
+
+    public static boolean isScreenHBMActive() {
+        return Utils.readFile(SCREEN_HBM).equals("1");
+    }
+
+    public static boolean hasScreenHBM() {
+        return Utils.existFile(SCREEN_HBM);
+    }
+
     public static void setScreenContrast(int value, Context context) {
         Control.runCommand(String.valueOf(value), SCREEN_KCAL_CTRL_CONT, Control.CommandType.GENERIC, context);
     }
@@ -494,29 +505,29 @@ public class Screen implements Constants {
     }
 
     public static List<String> getColorCalibrationLimits() {
-        String[] values;
+        List<String> list = new ArrayList<>();
         switch (SCREEN_CALIBRATION) {
             case SCREEN_SAMOLED_COLOR_RED:
             case SCREEN_COLOR_CONTROL:
-                values = new String[341];
-                for (int i = 0; i < values.length; i++)
-                    values[i] = String.valueOf(i + 60);
+                for (int i = 0; i < 341; i++)
+                    list.add(String.valueOf(i));
+                break;
+            case SCREEN_FB0_RGB:
+                for (int i = 255; i < 32769; i++)
+                    list.add(String.valueOf(i));
                 break;
             default:
                 int max = 255;
-                int min = 0;
                 for (String file : SCREEN_KCAL_CTRL_NEW_ARRAY)
                     if (Utils.existFile(file)) {
                         max = 256;
-                        min = 0;
                         break;
                     }
-                values = new String[max - min + 1];
-                for (int i = 0; i < values.length; i++)
-                    values[i] = String.valueOf(i);
+                for (int i = 0; i < max + 1; i++)
+                    list.add(String.valueOf(i));
                 break;
         }
-        return new ArrayList<>(Arrays.asList(values));
+        return list;
     }
 
     public static List<String> getColorCalibration() {
@@ -545,7 +556,7 @@ public class Screen implements Constants {
 
     public static boolean hasColorCalibrationCtrl() {
         if (SCREEN_CALIBRATION_CTRL == null)
-            for (String file : SCREEN_KCAL_CTRL_ARRAY)
+            for (String file : SCREEN_RGB_CTRL_ARRAY)
                 if (Utils.existFile(file)) {
                     SCREEN_CALIBRATION_CTRL = file;
                     return true;
@@ -554,7 +565,7 @@ public class Screen implements Constants {
     }
 
     public static boolean hasColorCalibration() {
-        if (SCREEN_CALIBRATION == null) for (String file : SCREEN_KCAL_ARRAY)
+        if (SCREEN_CALIBRATION == null) for (String file : SCREEN_RGB_ARRAY)
             if (Utils.existFile(file)) {
                 SCREEN_CALIBRATION = file;
                 return true;

@@ -16,7 +16,9 @@
 
 package com.grarak.kerneladiutor.utils;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.content.res.Resources;
@@ -91,6 +93,26 @@ public class Utils implements Constants {
 		}
 	}
 	
+    public static String getExternalStorage() {
+        return RootUtils.runCommand("echo ${SECONDARY_STORAGE%%:*}");
+    }
+
+    public static String getInternalStorage() {
+        return existFile("/data/media/0") ? "/data/media/0" : "/data/media";
+    }
+
+    public static void confirmDialog(String title, String message, DialogInterface.OnClickListener onClickListener,
+                                     Context context) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(context);
+        if (title != null) builder.setTitle(title);
+        if (message != null) builder.setMessage(message);
+        builder.setNegativeButton(context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+            }
+        }).setPositiveButton(context.getString(R.string.ok), onClickListener).show();
+    }
+
     public static String readAssetFile(Context context, String file) {
         BufferedReader in = null;
         try {

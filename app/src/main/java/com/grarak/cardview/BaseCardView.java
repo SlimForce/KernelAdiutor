@@ -23,6 +23,7 @@ import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -61,8 +62,7 @@ public abstract class BaseCardView extends CardView {
         super(context, attributeSet);
 
         LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        int margin = (int) (2.5 * getResources().getDisplayMetrics().density);
-        layoutParams.setMargins(margin, margin, margin, margin);
+        layoutParams.setMargins(8, 4, 8, 4);
         setLayoutParams(layoutParams);
         setRadius(0);
 
@@ -130,6 +130,10 @@ public abstract class BaseCardView extends CardView {
             innerView.setVisibility(GONE);
             customLayout.setVisibility(VISIBLE);
             customLayout.removeAllViews();
+            try {
+                ((ViewGroup) customView.getParent()).removeView(customView);
+            } catch (NullPointerException ignored) {
+            }
             customLayout.addView(customView);
         }
     }

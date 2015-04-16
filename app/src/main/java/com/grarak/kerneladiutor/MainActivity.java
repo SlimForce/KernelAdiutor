@@ -18,7 +18,6 @@ package com.grarak.kerneladiutor;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,6 +25,7 @@ import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
@@ -40,6 +40,7 @@ import android.widget.ListView;
 import com.grarak.kerneladiutor.elements.ListAdapter;
 import com.grarak.kerneladiutor.elements.ScrimInsetsFrameLayout;
 import com.grarak.kerneladiutor.elements.SplashView;
+import com.grarak.kerneladiutor.fragments.BaseFragment;
 import com.grarak.kerneladiutor.fragments.information.FrequencyTableFragment;
 import com.grarak.kerneladiutor.fragments.information.KernelInformationFragment;
 import com.grarak.kerneladiutor.fragments.kernel.BatteryFragment;
@@ -60,6 +61,7 @@ import com.grarak.kerneladiutor.fragments.other.FAQFragment;
 import com.grarak.kerneladiutor.fragments.other.SettingsFragment;
 import com.grarak.kerneladiutor.fragments.tools.BuildpropFragment;
 import com.grarak.kerneladiutor.fragments.tools.ProfileFragment;
+import com.grarak.kerneladiutor.fragments.tools.RecoveryFragment;
 import com.grarak.kerneladiutor.utils.Constants;
 import com.grarak.kerneladiutor.utils.Utils;
 import com.grarak.kerneladiutor.utils.kernel.CPUHotplug;
@@ -146,7 +148,7 @@ public class MainActivity extends ActionBarActivity implements Constants {
         cur_position = position;
 
         try {
-            getFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commitAllowingStateLoss();
+            getSupportFragmentManager().beginTransaction().replace(R.id.content_frame, fragment).commitAllowingStateLoss();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -186,6 +188,7 @@ public class MainActivity extends ActionBarActivity implements Constants {
         ITEMS.add(new ListAdapter.Header(getString(R.string.tools)));
         ITEMS.add(new ListAdapter.Item(getString(R.string.build_prop_editor), new BuildpropFragment()));
         ITEMS.add(new ListAdapter.Item(getString(R.string.profile), new ProfileFragment()));
+        ITEMS.add(new ListAdapter.Item(getString(R.string.recovery), new RecoveryFragment()));
         ITEMS.add(new ListAdapter.Header(getString(R.string.other)));
         ITEMS.add(new ListAdapter.Item(getString(R.string.settings), new SettingsFragment()));
         ITEMS.add(new ListAdapter.Item(getString(R.string.faq), new FAQFragment()));
@@ -301,14 +304,15 @@ public class MainActivity extends ActionBarActivity implements Constants {
 
     @Override
     public void onBackPressed() {
-        if (!mDrawerLayout.isDrawerOpen(mScrimInsetsFrameLayout)) super.onBackPressed();
-        else mDrawerLayout.closeDrawer(mScrimInsetsFrameLayout);
+        if (!((BaseFragment) ITEMS.get(cur_position).getFragment()).onBackPressed())
+            if (!mDrawerLayout.isDrawerOpen(mScrimInsetsFrameLayout)) super.onBackPressed();
+            else mDrawerLayout.closeDrawer(mScrimInsetsFrameLayout);
     }
 
     @Override
     protected void onDestroy() {
-        super.onDestroy();
         RootUtils.closeSU();
+        super.onDestroy();
     }
 
     public static void destroy() {
@@ -327,6 +331,10 @@ public class MainActivity extends ActionBarActivity implements Constants {
         } else params.width = tablet ? width / 2 : width - actionBarSize;
 
         return params;
+    }
+
+    public interface OnBackButtonListener {
+        boolean onBackPressed();
     }
 
 }

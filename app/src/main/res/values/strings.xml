@@ -54,6 +54,7 @@
     <string name="misc_controls">Misc Controls</string>
     <string name="build_prop_editor">Build prop Editor</string>
     <string name="profile">Profile</string>
+    <string name="recovery">Recovery</string>
     <string name="settings">Settings</string>
     <string name="faq">FAQ</string>
     <string name="about_us">About us</string>
@@ -244,6 +245,7 @@
     <string name="screen_hue_summary">You might get problems with MSM8x26 SoC when setting a high value.</string>
     <string name="screen_value">Screen Value</string>
     <string name="screen_contrast">Screen Contrast</string>
+    <string name="high_brightness_mode">High Brightness Mode</string>
     <string name="gamma">Gamma</string>
     <string name="gamma_profile">Gamma Profile</string>
     <string name="red_greys">Red Greys</string>
@@ -395,6 +397,8 @@
     <string name="power_suspend_state_summary">Kernel power management driver when screen is off. Better battery savings if enabled. Note: You can only change this setting if Power Suspend Mode is in User Mode.</string>
 
     <!-- Build prop Editor -->
+    <string name="backup">Backup</string>
+    <string name="add">Add</string>
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="key">Key</string>
@@ -412,6 +416,23 @@
     <string name="empty_name">Name is empty</string>
     <string name="press_again_to_apply">Press again to apply.</string>
     <string name="applied">Applied</string>
+
+    <!-- Recovery -->
+    <string name="your_recovery">Your Recovery</string>
+    <string name="reboot">Reboot</string>
+    <string name="reboot_recovery">Reboot Recovery</string>
+    <string name="reboot_bootloader">Reboot Bootloader</string>
+    <string name="reboot_download">Reboot Download</string>
+    <string name="cwm_recovery">CWM Recovery</string>
+    <string name="twrp">TWRP</string>
+    <string name="actions">Actions</string>
+    <string name="wipe_data">Wipe Data</string>
+    <string name="wipe_cache">Wipe Cache</string>
+    <string name="flash_zip">Flash Zip</string>
+    <string name="went_wrong">Something went wrong!</string>
+    <string name="flash_now">Flash Now</string>
+    <string name="flash_now_confirm">Do you want to run your actions? Your device will reboot into recovery and the actions will run in the order as you added them.</string>
+    <string name="add_action_first">You have to add an action first.</string>
 
     <!-- Settings -->
     <string name="dark_theme">Dark theme</string>
