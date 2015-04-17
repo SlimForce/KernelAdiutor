@@ -62,8 +62,7 @@ public class CPU implements Constants {
         String value = Utils.readFile(CPU_BOOST_INPUT_BOOST_FREQ);
         try {
             value = value.split("0:")[1].split(" ")[0];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            e.printStackTrace();
+        } catch (ArrayIndexOutOfBoundsException ignored) {
         }
         if (value.equals("0")) return 0;
         return CPU.getFreqs().indexOf(Utils.stringToInt(value)) + 1;
@@ -211,6 +210,20 @@ public class CPU implements Constants {
 
     public static boolean hasMcPowerSaving() {
         return Utils.existFile(CPU_MC_POWER_SAVING);
+    }
+
+    public static void activatePowerSavingWq(boolean active, Context context) {
+        String command = active ? "Y" : "N";
+        Control.runCommand(command, CPU_WQ_POWER_SAVING, Control.CommandType.GENERIC, context);
+    }
+
+    public static boolean isPowerSavingWqActive() {
+        String value = Utils.readFile(CPU_WQ_POWER_SAVING);
+        return value.equals("Y");
+    }
+
+    public static boolean hasPowerSavingWq() {
+        return Utils.existFile(CPU_WQ_POWER_SAVING);
     }
 
     public static ArrayList<String> getAvailableGovernors() {
