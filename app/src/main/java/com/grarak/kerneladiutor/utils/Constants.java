@@ -38,6 +38,8 @@ public interface Constants {
     String PROC_MEMINFO = "/proc/meminfo";
 
     // CPU
+    String CPU_TEMP_ZONE0 = "/sys/class/thermal/thermal_zone0/temp";
+    String CPU_TEMP_ZONE1 = "/sys/class/thermal/thermal_zone1/temp";
     String CPU_CORE_ONLINE = "/sys/devices/system/cpu/cpu%d/online";
     String CPU_AVAILABLE_FREQS = "/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies";
     String CPU_TIME_STATE = "/sys/devices/system/cpu/cpu0/cpufreq/stats/time_in_state";
@@ -63,8 +65,7 @@ public interface Constants {
     String CPU_BOOST_INPUT_BOOST_FREQ = "/sys/module/cpu_boost/parameters/input_boost_freq";
 
     String[] CPU_BOOST_ARRAY = {CPU_BOOST, CPU_BOOST_ENABLE, CPU_BOOST_ENABLE_2, CPU_BOOST_DEBUG_MASK, CPU_BOOST_MS,
-            CPU_BOOST_SYNC_THRESHOLD, CPU_BOOST_INPUT_MS,
-            CPU_BOOST_INPUT_BOOST_FREQ};
+            CPU_BOOST_SYNC_THRESHOLD, CPU_BOOST_INPUT_MS, CPU_BOOST_INPUT_BOOST_FREQ};
 
     // CPU Voltage
     String CPU_VOLTAGE = "/sys/devices/system/cpu/cpu0/cpufreq/UV_mV_table";
@@ -353,8 +354,8 @@ public interface Constants {
 
     String[] GAMMACONTROL_ARRAY = {GAMMACONTROL_RED_GREYS, GAMMACONTROL_RED_MIDS, GAMMACONTROL_RED_BLACKS, GAMMACONTROL_RED_WHITES,
             GAMMACONTROL_GREEN_GREYS, GAMMACONTROL_GREEN_MIDS, GAMMACONTROL_GREEN_BLACKS, GAMMACONTROL_GREEN_WHITES,
-            GAMMACONTROL_BLUE_GREYS, GAMMACONTROL_BLUE_MIDS, GAMMACONTROL_BLUE_BLACKS, GAMMACONTROL_BLUE_WHITES, GAMMACONTROL_CONTRAST,
-            GAMMACONTROL_BRIGHTNESS, GAMMACONTROL_SATURATION};
+            GAMMACONTROL_BLUE_GREYS, GAMMACONTROL_BLUE_MIDS, GAMMACONTROL_BLUE_BLACKS, GAMMACONTROL_BLUE_WHITES,
+            GAMMACONTROL_CONTRAST, GAMMACONTROL_BRIGHTNESS, GAMMACONTROL_SATURATION};
 
     String DSI_PANEL_RP = "/sys/module/dsi_panel/kgamma_rp";
     String DSI_PANEL_RN = "/sys/module/dsi_panel/kgamma_rn";
@@ -366,12 +367,16 @@ public interface Constants {
 
     String[] DSI_PANEL_ARRAY = {DSI_PANEL_RP, DSI_PANEL_RN, DSI_PANEL_GP, DSI_PANEL_GN, DSI_PANEL_BP, DSI_PANEL_BN, DSI_PANEL_W};
 
-    // Backlight
+    // LCD Backlight
+    String LM3530_BRIGTHNESS_MODE = "/sys/devices/i2c-0/0-0038/lm3530_br_mode";
+    String LM3530_MIN_BRIGHTNESS = "/sys/devices/i2c-0/0-0038/lm3530_min_br";
+    String LM3530_MAX_BRIGHTNESS = "/sys/devices/i2c-0/0-0038/lm3530_max_br";
+
+    // Backlight Dimmer
     String LM3630_BACKLIGHT_DIMMER = "/sys/module/lm3630_bl/parameters/backlight_dimmer";
     String LM3630_MIN_BRIGHTNESS = "/sys/module/lm3630_bl/parameters/min_brightness";
     String LM3630_BACKLIGHT_DIMMER_THRESHOLD = "/sys/module/lm3630_bl/parameters/backlight_threshold";
     String LM3630_BACKLIGHT_DIMMER_OFFSET = "/sys/module/lm3630_bl/parameters/backlight_offset";
-    String LM3530_EXPONENTIAL_BL = "/sys/devices/i2c-0/0-0038/lm3530_br_mode";
 
     String MSM_BACKLIGHT_DIMMER = "/sys/module/msm_fb/parameters/backlight_dimmer";
 
@@ -379,8 +384,8 @@ public interface Constants {
 
     String[][] SCREEN_ARRAY = {SCREEN_RGB_ARRAY, SCREEN_RGB_CTRL_ARRAY, MIN_BRIGHTNESS_ARRAY, SCREEN_KCAL_CTRL_NEW_ARRAY,
             K_GAMMA_ARRAY, GAMMACONTROL_ARRAY, DSI_PANEL_ARRAY,
-            {SCREEN_KCAL_CTRL_MIN, SCREEN_HBM, LM3630_BACKLIGHT_DIMMER, LM3630_BACKLIGHT_DIMMER_THRESHOLD,
-                    LM3630_BACKLIGHT_DIMMER_OFFSET, LM3530_EXPONENTIAL_BL}};
+            {SCREEN_KCAL_CTRL_MIN, SCREEN_HBM, LM3530_BRIGTHNESS_MODE, LM3530_MIN_BRIGHTNESS, LM3530_MAX_BRIGHTNESS,
+                    LM3630_BACKLIGHT_DIMMER, LM3630_BACKLIGHT_DIMMER_THRESHOLD, LM3630_BACKLIGHT_DIMMER_OFFSET}};
 
     // Wake
 
@@ -436,8 +441,14 @@ public interface Constants {
     String SPEAKER_GAIN = "/sys/kernel/sound_control_3/gpl_speaker_gain";
     String HEADPHONE_POWERAMP_GAIN = "/sys/kernel/sound_control_3/gpl_headphone_pa_gain";
 
-    String[] SOUND_ARRAY = {SOUND_CONTROL_ENABLE, HEADPHONE_GAIN, HANDSET_MICROPONE_GAIN, CAM_MICROPHONE_GAIN,
-            SPEAKER_GAIN, HEADPHONE_POWERAMP_GAIN};
+    String MIC_BOOST = "/sys/devices/virtual/misc/soundcontrol/mic_boost";
+    String SPEAKER_BOOST = "/sys/devices/virtual/misc/soundcontrol/mic_boost";
+    String VOLUME_BOOST = "/sys/devices/virtual/misc/soundcontrol/mic_boost";
+
+    String[] SPEAKER_GAIN_ARRAY = {SPEAKER_GAIN, SPEAKER_BOOST};
+
+    String[][] SOUND_ARRAY = {SPEAKER_GAIN_ARRAY, {SOUND_CONTROL_ENABLE, HEADPHONE_GAIN, HANDSET_MICROPONE_GAIN, CAM_MICROPHONE_GAIN,
+            HEADPHONE_POWERAMP_GAIN, MIC_BOOST, VOLUME_BOOST}};
 
     // Battery
     String FORCE_FAST_CHARGE = "/sys/kernel/fast_charge/force_fast_charge";
@@ -489,8 +500,6 @@ public interface Constants {
     String[] VM_ARRAY = {VM_PATH, ZRAM_BLOCK, ZRAM_DISKSIZE, ZRAM_RESET};
 
     // Misc
-    // TCP
-    String TCP_AVAILABLE_CONGESTIONS = "/proc/sys/net/ipv4/tcp_available_congestion_control";
 
     // Vibration
     String VIBRATION_ENABLE = "/sys/class/timed_output/vibrator/enable";
@@ -527,7 +536,8 @@ public interface Constants {
     // SELinux
     String SELINUX = "selinux";
 
-    // Dynamic Fsync
+    // Fsync
+    String FSYNC = "/sys/devices/virtual/misc/fsynccontrol/fsync_enabled";
     String DYNAMIC_FSYNC = "/sys/kernel/dyn_fsync/Dyn_fsync_active";
 
     // Power suspend
@@ -536,8 +546,13 @@ public interface Constants {
     String POWER_SUSPEND_STATE = POWER_SUSPEND + "/power_suspend_state";
     String POWER_SUSPEND_VERSION = POWER_SUSPEND + "/power_suspend_version";
 
-    String[][] MISC_ARRAY = {{TCP_AVAILABLE_CONGESTIONS, SMB135X_WAKELOCK, SENSOR_IND_WAKELOCK, MSM_HSIC_HOST_WAKELOCK,
-            LOGGER_ENABLED, SELINUX, DYNAMIC_FSYNC, POWER_SUSPEND_MODE, POWER_SUSPEND_STATE}, VIBRATION_ARRAY};
+    // Network
+    String TCP_AVAILABLE_CONGESTIONS = "/proc/sys/net/ipv4/tcp_available_congestion_control";
+    String HOSTNAME_KEY = "net.hostname";
+
+    String[][] MISC_ARRAY = {{SMB135X_WAKELOCK, SENSOR_IND_WAKELOCK, MSM_HSIC_HOST_WAKELOCK,
+            LOGGER_ENABLED, FSYNC, SELINUX, DYNAMIC_FSYNC, POWER_SUSPEND_MODE, POWER_SUSPEND_STATE, TCP_AVAILABLE_CONGESTIONS, HOSTNAME_KEY},
+            VIBRATION_ARRAY};
 
     // Build prop
     String BUILD_PROP = "/system/build.prop";

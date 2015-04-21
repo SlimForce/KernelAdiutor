@@ -71,30 +71,34 @@ public class Utils implements Constants {
     public static String CPU_MAX_SCREEN_OFF_FREQ = "/sys/devices/system/cpu/cpu%d/cpufreq/screen_off_max_freq";
     public static String CPU_MSM_CPUFREQ_LIMIT = "/sys/kernel/msm_cpufreq_limit/cpufreq_limit";
     public static String CPU_SCALING_GOVERNOR = "/sys/devices/system/cpu/cpu%d/cpufreq/scaling_governor";
-    private static String[][] CPU_ARRAY = {{CPU_CUR_FREQ, CPU_CORE_ONLINE, CPU_MAX_FREQ, CPU_MIN_FREQ, CPU_MAX_SCREEN_OFF_FREQ,
-            CPU_MSM_CPUFREQ_LIMIT, CPU_AVAILABLE_FREQS, CPU_TIME_STATE, CPU_SCALING_GOVERNOR, CPU_AVAILABLE_GOVERNORS,
-            CPU_GOVERNOR_TUNABLES, CPU_MC_POWER_SAVING, CPU_WQ_POWER_SAVING, CPU_AVAILABLE_CFS_SCHEDULERS,
+
+    private static String[][] CPU_ARRAY = {{CPU_CUR_FREQ, CPU_TEMP_ZONE0, CPU_TEMP_ZONE1, CPU_CORE_ONLINE, CPU_MAX_FREQ, CPU_MIN_FREQ,
+            CPU_MAX_SCREEN_OFF_FREQ, CPU_MSM_CPUFREQ_LIMIT, CPU_AVAILABLE_FREQS, CPU_TIME_STATE, CPU_SCALING_GOVERNOR,
+            CPU_AVAILABLE_GOVERNORS, CPU_GOVERNOR_TUNABLES, CPU_MC_POWER_SAVING, CPU_WQ_POWER_SAVING, CPU_AVAILABLE_CFS_SCHEDULERS,
             CPU_CURRENT_CFS_SCHEDULER}, CPU_TEMP_LIMIT_ARRAY, CPU_BOOST_ARRAY} ;
+
     public static void checkMsmLimiter() {
 		if( MSM_LIMITER_INITED ) {
 			return ;
 		}
 		MSM_LIMITER_INITED	= true ;
 		if( existFile(CPU_MSM_LIMITER) ) {
+			CPU_CUR_FREQ = "/sys/kernel/msm_limiter/live_cur_freq_%d";
 			CPU_MAX_FREQ = "/sys/kernel/msm_limiter/resume_max_freq_%d";
 			CPU_MIN_FREQ = "/sys/kernel/msm_limiter/suspend_min_freq_%d";
 			CPU_MAX_SCREEN_OFF_FREQ = "/sys/kernel/msm_limiter/suspend_max_freq";
 			CPU_MSM_CPUFREQ_LIMIT = "/sys/kernel/msm_limiter/limiter_enabled";
 			CPU_SCALING_GOVERNOR = "/sys/kernel/msm_limiter/scaling_governor_%d";
-			CPU_ARRAY =	new  String[][] { new  String[]{CPU_CUR_FREQ, CPU_CORE_ONLINE, CPU_MAX_FREQ, CPU_MIN_FREQ, CPU_MAX_SCREEN_OFF_FREQ,
-            CPU_MSM_CPUFREQ_LIMIT, CPU_AVAILABLE_FREQS, CPU_TIME_STATE, CPU_SCALING_GOVERNOR, CPU_AVAILABLE_GOVERNORS,
-            CPU_GOVERNOR_TUNABLES, CPU_MC_POWER_SAVING, CPU_WQ_POWER_SAVING, CPU_AVAILABLE_CFS_SCHEDULERS,
+			CPU_ARRAY =	new  String[][] { new  String[]{CPU_CUR_FREQ, CPU_TEMP_ZONE0, CPU_TEMP_ZONE1, CPU_CORE_ONLINE, CPU_MAX_FREQ, CPU_MIN_FREQ,
+            CPU_MAX_SCREEN_OFF_FREQ, CPU_MSM_CPUFREQ_LIMIT, CPU_AVAILABLE_FREQS, CPU_TIME_STATE, CPU_SCALING_GOVERNOR,
+            CPU_AVAILABLE_GOVERNORS, CPU_GOVERNOR_TUNABLES, CPU_MC_POWER_SAVING, CPU_WQ_POWER_SAVING, CPU_AVAILABLE_CFS_SCHEDULERS,
             CPU_CURRENT_CFS_SCHEDULER}, CPU_TEMP_LIMIT_ARRAY, CPU_BOOST_ARRAY};
 		}
 	}
 	
     public static String getExternalStorage() {
-        return RootUtils.runCommand("echo ${SECONDARY_STORAGE%%:*}");
+        String path = RootUtils.runCommand("echo ${SECONDARY_STORAGE%%:*}");
+        return path.contains("/") ? path : null;
     }
 
     public static String getInternalStorage() {
@@ -157,8 +161,7 @@ public class Utils implements Constants {
 
         if (mClass == BatteryFragment.class)
             applys.addAll(new ArrayList<>(Arrays.asList(BATTERY_ARRAY)));
-
-        if (mClass == CPUFragment.class) {
+        else if (mClass == CPUFragment.class) {
             for (String[] array : CPU_ARRAY)
                 for (String cpu : array)
                     if (cpu.startsWith("/sys/devices/system/cpu/cpu%d/cpufreq"))
@@ -179,8 +182,8 @@ public class Utils implements Constants {
             applys.addAll(new ArrayList<>(Arrays.asList(arrays)));
         else if (mClass == ScreenFragment.class) for (String[] arrays : SCREEN_ARRAY)
             applys.addAll(new ArrayList<>(Arrays.asList(arrays)));
-        else if (mClass == SoundFragment.class)
-            applys.addAll(new ArrayList<>(Arrays.asList(SOUND_ARRAY)));
+        else if (mClass == SoundFragment.class) for (String[] arrays : SOUND_ARRAY)
+            applys.addAll(new ArrayList<>(Arrays.asList(arrays)));
         else if (mClass == VMFragment.class)
             applys.addAll(new ArrayList<>(Arrays.asList(VM_ARRAY)));
         else if (mClass == WakeFragment.class) for (String[] arrays : WAKE_ARRAY)
@@ -189,8 +192,9 @@ public class Utils implements Constants {
         return applys;
     }
 
-    public static float celsiusToFahrenheit(float celsius) {
-        return celsius * 9 / 5 + 32;
+    public static double celsiusToFahrenheit(double celsius) {
+        double temp = celsius * 9 / 5 + 32;
+        return (double) Math.round(temp * 100.0) / 100.0;
     }
 
     public static long stringToLong(String string) {
@@ -266,6 +270,10 @@ public class Utils implements Constants {
     public static void saveString(String name, String value, Context context) {
         Log.i(TAG, "saving " + name + " as " + value);
         context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE).edit().putString(name, value).apply();
+    }
+
+    public static String getProp(String key) {
+        return RootUtils.runCommand("getprop " + key);
     }
 
     public static boolean isServiceActive(String service) {

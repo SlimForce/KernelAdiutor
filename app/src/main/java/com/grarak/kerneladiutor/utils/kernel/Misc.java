@@ -37,6 +37,27 @@ public class Misc implements Constants {
     private static Integer VIBRATION_MAX;
     private static Integer VIBRATION_MIN;
 
+    public static void setHostname(String value, Context context) {
+        Control.setProp(HOSTNAME_KEY, value, context);
+    }
+
+    public static String getHostname() {
+        return Utils.getProp(HOSTNAME_KEY);
+    }
+
+    public static void setTcpCongestion(String tcpCongestion, Context context) {
+        Control.runCommand("sysctl -w net.ipv4.tcp_congestion_control=" + tcpCongestion,
+                TCP_AVAILABLE_CONGESTIONS, Control.CommandType.CUSTOM, context);
+    }
+
+    public static String getCurTcpCongestion() {
+        return getTcpAvailableCongestions().get(0);
+    }
+
+    public static List<String> getTcpAvailableCongestions() {
+        return new ArrayList<>(Arrays.asList(Utils.readFile(TCP_AVAILABLE_CONGESTIONS).split(" ")));
+    }
+
     public static void setNewPowerSuspend(int value, Context context) {
         Control.runCommand(String.valueOf(value), POWER_SUSPEND_STATE, Control.CommandType.GENERIC, context);
     }
@@ -108,6 +129,18 @@ public class Misc implements Constants {
             return status == RootUtils.SELINUX_STATUS.PERMISSIVE || status == RootUtils.SELINUX_STATUS.ENFORCING;
         }
         return false;
+    }
+
+    public static void activateFsync(boolean active, Context context) {
+        Control.runCommand(active ? "1" : "0", FSYNC, Control.CommandType.GENERIC, context);
+    }
+
+    public static boolean isFsyncActive() {
+        return Utils.readFile(FSYNC).equals("1");
+    }
+
+    public static boolean hasFsync() {
+        return Utils.existFile(FSYNC);
     }
 
     public static void activateMsmHsicHostWakeLock(boolean active, Context context) {
@@ -219,18 +252,5 @@ public class Misc implements Constants {
                 break;
             }
         return VIBRATION_PATH != null;
-    }
-
-    public static void setTcpCongestion(String tcpCongestion, Context context) {
-        Control.runCommand("sysctl -w net.ipv4.tcp_congestion_control=" + tcpCongestion,
-                TCP_AVAILABLE_CONGESTIONS, Control.CommandType.CUSTOM, context);
-    }
-
-    public static String getCurTcpCongestion() {
-        return getTcpAvailableCongestions().get(0);
-    }
-
-    public static List<String> getTcpAvailableCongestions() {
-        return new ArrayList<>(Arrays.asList(Utils.readFile(TCP_AVAILABLE_CONGESTIONS).split(" ")));
     }
 }
