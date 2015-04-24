@@ -16,11 +16,11 @@
 
 package com.grarak.kerneladiutor.fragments;
 
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.Gravity;
 import android.view.View;
@@ -45,13 +45,14 @@ public abstract class PathReaderFragment extends RecyclerViewFragment {
         GOVERNOR, IO
     }
 
-    private TextView errorText;
+    private TextView title;
     private SwipeRefreshLayout refreshLayout;
 
     @Override
     public RecyclerView getRecyclerView() {
-        errorText = (TextView) getParentView(R.layout.swiperefresh_recyclerview).findViewById(R.id.error_text);
-        refreshLayout = (SwipeRefreshLayout) getParentView(R.layout.swiperefresh_recyclerview).findViewById(R.id.refresh_layout);
+        View view = getParentView(R.layout.swiperefresh_recyclerview);
+        title = (TextView) view.findViewById(R.id.title_view);
+        refreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.refresh_layout);
         refreshLayout.setColorSchemeColors(getResources().getColor(R.color.color_primary));
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -137,11 +138,10 @@ public abstract class PathReaderFragment extends RecyclerViewFragment {
             @Override
             public void run() {
                 if (getCount() < 1) {
-                    errorText.setVisibility(View.VISIBLE);
-                    errorText.setText(getError(getActivity()));
+                    title.setText(getError(getActivity()));
                     recyclerView.setVisibility(View.GONE);
                 } else {
-                    errorText.setVisibility(View.GONE);
+                    title.setText(getName());
                     recyclerView.setVisibility(View.VISIBLE);
                 }
             }
@@ -156,6 +156,8 @@ public abstract class PathReaderFragment extends RecyclerViewFragment {
         editText.setGravity(Gravity.CENTER);
         editText.setLayoutParams(new LinearLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        if (!Utils.DARKTHEME)
+            editText.setTextColor(getResources().getColor(R.color.black));
         editText.setText(value);
 
         layout.addView(editText);
@@ -191,6 +193,8 @@ public abstract class PathReaderFragment extends RecyclerViewFragment {
     @Override
     public void animateRecyclerView() {
     }
+
+    public abstract String getName();
 
     public abstract String getPath();
 

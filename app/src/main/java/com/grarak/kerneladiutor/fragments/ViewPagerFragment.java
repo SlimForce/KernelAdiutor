@@ -24,11 +24,12 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SwitchCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.CompoundButton;
 
 import com.grarak.kerneladiutor.R;
 import com.grarak.kerneladiutor.elements.CustomViewPager;
@@ -76,10 +77,12 @@ public abstract class ViewPagerFragment extends BaseFragment implements IViewPag
         if (showApplyOnBoot()) {
             applyOnBootView = (SwitchCompat) view.findViewById(R.id.apply_on_boot_view);
             applyOnBootView.setChecked(Utils.getBoolean(getClass().getSimpleName() + "onboot", false, getActivity()));
-            applyOnBootView.setOnClickListener(new View.OnClickListener() {
+            applyOnBootView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
-                public void onClick(View v) {
-                    activateApplyOnBoot(applyOnBootView.isChecked());
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    Utils.saveBoolean(getClass().getSimpleName() + "onboot", isChecked, getActivity());
+                    Utils.toast(getString(isChecked ? R.string.apply_on_boot_enabled : R.string.apply_on_boot_disabled,
+                            getActionBar().getTitle()), getActivity());
                 }
             });
 
@@ -88,7 +91,6 @@ public abstract class ViewPagerFragment extends BaseFragment implements IViewPag
                 @Override
                 public void onClick(View v) {
                     applyOnBootView.setChecked(!applyOnBootView.isChecked());
-                    activateApplyOnBoot(applyOnBootView.isChecked());
                 }
             });
         } else showApplyOnBoot(false);
@@ -162,12 +164,6 @@ public abstract class ViewPagerFragment extends BaseFragment implements IViewPag
 
     }
 
-    private void activateApplyOnBoot(boolean active) {
-        Utils.saveBoolean(getClass().getSimpleName() + "onboot", active, getActivity());
-        Utils.toast(getString(active ? R.string.apply_on_boot_enabled : R.string.apply_on_boot_disabled,
-                getActionBar().getTitle()), getActivity());
-    }
-
     public boolean showApplyOnBoot() {
         return true;
     }
@@ -178,7 +174,7 @@ public abstract class ViewPagerFragment extends BaseFragment implements IViewPag
     }
 
     public ActionBar getActionBar() {
-        return ((ActionBarActivity) getActivity()).getSupportActionBar();
+        return ((AppCompatActivity) getActivity()).getSupportActionBar();
     }
 
     @Override

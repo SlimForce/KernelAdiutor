@@ -17,7 +17,6 @@
 package com.grarak.kerneladiutor;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,8 +27,10 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
@@ -76,7 +77,7 @@ import com.grarak.kerneladiutor.utils.root.RootUtils;
 /**
  * Created by willi on 01.12.14.
  */
-public class MainActivity extends ActionBarActivity implements Constants {
+public class MainActivity extends AppCompatActivity implements Constants {
 
     private static Context context;
     private boolean hasRoot;
@@ -152,7 +153,9 @@ public class MainActivity extends ActionBarActivity implements Constants {
             e.printStackTrace();
         }
 
-        setTitle(ITEMS.get(position).getTitle());
+        ActionBar actionBar;
+        if ((actionBar = getSupportActionBar()) != null)
+            actionBar.setTitle(ITEMS.get(position).getTitle());
         mDrawerList.setItemChecked(position, true);
     }
 
@@ -197,7 +200,7 @@ public class MainActivity extends ActionBarActivity implements Constants {
     private void setView() {
         mScrimInsetsFrameLayout = (ScrimInsetsFrameLayout) findViewById(R.id.scrimInsetsFrameLayout);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-        mDrawerLayout.setStatusBarBackgroundColor(getResources().getColor(R.color.color_primary_dark));
+        mDrawerLayout.setStatusBarBackgroundColor(getResources().getColor(R.color.statusbar_color));
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
         mDrawerList = (ListView) findViewById(R.id.drawer_list);
         mSplashView = (SplashView) findViewById(R.id.splash_view);

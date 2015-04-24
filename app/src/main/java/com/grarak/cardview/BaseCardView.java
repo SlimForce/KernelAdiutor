@@ -19,13 +19,13 @@ package com.grarak.cardview;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
+import android.support.v7.widget.AppCompatTextView;
 import android.support.v7.widget.CardView;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.grarak.kerneladiutor.R;
 import com.grarak.kerneladiutor.utils.Utils;
@@ -37,13 +37,15 @@ public abstract class BaseCardView extends CardView {
 
     private static final int DEFAULT_LAYOUT = R.layout.inner_cardview;
 
+    protected View layoutView;
+
     private HeaderCardView headerCardView;
     private LinearLayout headerLayout;
 
-    private TextView innerView;
+    private AppCompatTextView innerView;
     private String mTitle;
 
-    private LinearLayout customLayout;
+    protected LinearLayout customLayout;
     private View customView;
 
     public BaseCardView(Context context) {
@@ -61,10 +63,11 @@ public abstract class BaseCardView extends CardView {
     public BaseCardView(Context context, AttributeSet attributeSet, int layout) {
         super(context, attributeSet);
 
+        int density = (int) getResources().getDisplayMetrics().density;
         LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        layoutParams.setMargins(8, 4, 8, 4);
+        layoutParams.setMargins(4 * density, 2 * density, 4 * density, 2 * density);
         setLayoutParams(layoutParams);
-        setRadius(0);
+        setRadius(2 * density);
 
         setCardBackgroundColor(getResources().getColor(Utils.DARKTHEME ?
                 R.color.card_background_dark : R.color.card_background_light));
@@ -83,9 +86,9 @@ public abstract class BaseCardView extends CardView {
         LinearLayout innerLayout = (LinearLayout) view.findViewById(R.id.inner_layout);
         customLayout = (LinearLayout) view.findViewById(R.id.custom_layout);
 
-        View layoutView = LayoutInflater.from(getContext()).inflate(layout, null, false);
+        layoutView = LayoutInflater.from(getContext()).inflate(layout, null, false);
         if (layout == DEFAULT_LAYOUT) {
-            innerView = (TextView) layoutView.findViewById(R.id.inner_view);
+            innerView = (AppCompatTextView) layoutView.findViewById(R.id.inner_view);
             if (mTitle != null) innerView.setText(mTitle);
         } else setUpInnerLayout(layoutView);
 

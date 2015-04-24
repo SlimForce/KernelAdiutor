@@ -26,6 +26,7 @@ import android.util.AttributeSet;
 import android.view.View;
 
 import com.grarak.kerneladiutor.R;
+import com.grarak.kerneladiutor.utils.Utils;
 
 /**
  * Created by willi on 05.02.15.
@@ -58,7 +59,8 @@ public class CircleChart extends View {
         mPaintBackground.setStrokeWidth(Math.round(1 * density));
         mPaintBackground.setAntiAlias(true);
         mPaintBackground.setStyle(Paint.Style.STROKE);
-        mPaintBackground.setColor(getResources().getColor(R.color.circlebar_background));
+        mPaintBackground.setColor(getResources().getColor(Utils.DARKTHEME ? R.color.circlebar_background_dark
+                : R.color.circlebar_background_light));
         mPaintBackground.setStrokeCap(Paint.Cap.ROUND);
 
         mPaintCircle = new Paint();
@@ -75,7 +77,7 @@ public class CircleChart extends View {
     public void draw(@NonNull Canvas canvas) {
         super.draw(canvas);
 
-        draw(canvas, getWidth() - 10, getHeight() - 10);
+        draw(canvas, getMeasuredWidth() - 10, getMeasuredHeight() - 10);
     }
 
     private void draw(Canvas canvas, int x, int y) {
@@ -105,6 +107,33 @@ public class CircleChart extends View {
 
     public void setMax(int max) {
         mMax = max;
+    }
+
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+
+        int density = (int) getResources().getDisplayMetrics().density;
+        int desiredWidth = 75 * density;
+        int desiredHeight = 75 * density;
+
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+
+        int width;
+        int height;
+
+        if (widthMode == MeasureSpec.EXACTLY) width = widthSize;
+        else if (widthMode == MeasureSpec.AT_MOST) width = Math.min(desiredWidth, widthSize);
+        else width = desiredWidth;
+
+        if (heightMode == MeasureSpec.EXACTLY) height = heightSize;
+        else if (heightMode == MeasureSpec.AT_MOST) height = Math.min(desiredHeight, heightSize);
+        else height = desiredHeight;
+
+        setMeasuredDimension(width, height);
     }
 
 }

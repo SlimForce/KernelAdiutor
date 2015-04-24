@@ -18,8 +18,10 @@ package com.grarak.kerneladiutor.fragments.tools;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.v7.internal.widget.TintRadioButton;
+import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatRadioButton;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -51,8 +53,9 @@ import java.util.List;
 public class RecoveryFragment extends RecyclerViewFragment {
 
     private LinearLayout mRecoveryLayout;
-    private TintRadioButton mCWMRecoveryButton;
-    private TintRadioButton mTWRPButton;
+    private AppCompatRadioButton mCWMRecoveryButton;
+    private AppCompatRadioButton mTWRPButton;
+    private AppCompatButton mFlashNowButton;
 
     private FloatingActionsMenu mActionMenu;
     private List<Recovery> mCommands;
@@ -92,7 +95,8 @@ public class RecoveryFragment extends RecyclerViewFragment {
             }
         });
 
-        view.findViewById(R.id.flash_now_button).setOnClickListener(new View.OnClickListener() {
+        mFlashNowButton = (AppCompatButton) view.findViewById(R.id.flash_now_button);
+        mFlashNowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mCommands.size() < 1) {
@@ -117,6 +121,8 @@ public class RecoveryFragment extends RecyclerViewFragment {
                 }, getActivity());
             }
         });
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+            mFlashNowButton.setVisibility(View.INVISIBLE);
 
         animateFab();
         return (RecyclerView) view.findViewById(R.id.recycler_view);
@@ -130,16 +136,12 @@ public class RecoveryFragment extends RecyclerViewFragment {
     }
 
     @Override
-    public void postInitCardView(Bundle savedInstanceState) {
-    }
-
-    @Override
     public void preInitCardView() {
         mRecoveryLayout = new LinearLayout(getActivity());
         mRecoveryLayout.setOrientation(LinearLayout.VERTICAL);
 
-        mCWMRecoveryButton = new TintRadioButton(getActivity());
-        mTWRPButton = new TintRadioButton(getActivity());
+        mCWMRecoveryButton = new AppCompatRadioButton(getActivity());
+        mTWRPButton = new AppCompatRadioButton(getActivity());
 
         mTWRPButton.setChecked(Utils.getBoolean("twrp", false, getActivity()));
         mCWMRecoveryButton.setChecked(!mTWRPButton.isChecked());
@@ -172,6 +174,7 @@ public class RecoveryFragment extends RecyclerViewFragment {
 
         CardViewItem.DCardView mRecoveryCard = new CardViewItem.DCardView();
         mRecoveryCard.setTitle(getString(R.string.your_recovery));
+        mRecoveryCard.setFullSpan(true);
         mRecoveryCard.setView(mRecoveryLayout);
 
         addView(mRecoveryCard);
@@ -180,6 +183,11 @@ public class RecoveryFragment extends RecyclerViewFragment {
         mActionsDividerCard.setText(getString(R.string.actions));
 
         addView(mActionsDividerCard);
+    }
+
+    @Override
+    public void postInitCardView(Bundle savedInstanceState) {
+        Utils.circleAnimate(mFlashNowButton, 0, mFlashNowButton.getHeight());
     }
 
     private void addAction(Recovery.RECOVERY_COMMAND recovery_command, File file) {

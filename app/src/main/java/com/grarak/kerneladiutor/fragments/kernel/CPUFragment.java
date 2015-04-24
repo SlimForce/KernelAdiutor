@@ -18,11 +18,12 @@ package com.grarak.kerneladiutor.fragments.kernel;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatCheckBox;
+import android.support.v7.widget.AppCompatTextView;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.grarak.kerneladiutor.R;
 import com.grarak.kerneladiutor.elements.CardViewItem;
@@ -30,7 +31,7 @@ import com.grarak.kerneladiutor.elements.DAdapter;
 import com.grarak.kerneladiutor.elements.DividerCardView;
 import com.grarak.kerneladiutor.elements.PopupCardItem;
 import com.grarak.kerneladiutor.elements.SeekBarCardView;
-import com.grarak.kerneladiutor.elements.SwitchCompatCardItem;
+import com.grarak.kerneladiutor.elements.SwitchCardItem;
 import com.grarak.kerneladiutor.elements.UsageCardView;
 import com.grarak.kerneladiutor.fragments.PathReaderFragment;
 import com.grarak.kerneladiutor.fragments.RecyclerViewFragment;
@@ -50,8 +51,6 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
     private static CPUFragment cpuFragment;
     private static GovernorPart governorPart;
 
-    private String mTitle;
-
     @Override
     public void initCardView(Bundle savedInstanceState) {
         cpuFragment = this;
@@ -60,20 +59,12 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
         allowSwipe(false);
         addFragment(new CPUPart());
         addFragment(governorPart);
-
-        mTitle = getActionBar().getTitle().toString();
     }
 
     @Override
     public void onSwipe(int page) {
         super.onSwipe(page);
-        if (page == 0) {
-            getActionBar().setTitle(mTitle);
-            allowSwipe(false);
-        } else if (page == 1) {
-            getActionBar().setTitle(CPU.getCurGovernor(0));
-            allowSwipe(true);
-        }
+        allowSwipe(page == 1);
     }
 
     @Override
@@ -88,14 +79,15 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
     public static class CPUPart extends RecyclerViewFragment implements View.OnClickListener,
             PopupCardItem.DPopupCard.OnDPopupCardListener, CardViewItem.DCardView.OnDCardListener,
             SeekBarCardView.DSeekBarCardView.OnDSeekBarCardListener,
-            SwitchCompatCardItem.DSwitchCompatCard.OnDSwitchCompatCardListener {
+            SwitchCardItem.DSwitchCard.OnDSwitchCardListener {
 
         private UsageCardView.DUsageCard mUsageCard;
-        private CardViewItem.DCardView mTempCard;
 
-        private CheckBox[] mCoreCheckBox;
+        private AppCompatCheckBox[] mCoreCheckBox;
         private ProgressBar[] mCoreProgressBar;
-        private TextView[] mCoreFreqText;
+        private AppCompatTextView[] mCoreFreqText;
+
+        private CardViewItem.DCardView mTempCard;
 
         private PopupCardItem.DPopupCard mMaxFreqCard, mMinFreqCard, mMaxScreenOffFreqCard;
 
@@ -104,14 +96,14 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
 
         private PopupCardItem.DPopupCard mMcPowerSavingCard;
 
-        private SwitchCompatCardItem.DSwitchCompatCard mPowerSavingWqCard;
+        private SwitchCardItem.DSwitchCard mPowerSavingWqCard;
 
         private PopupCardItem.DPopupCard mCFSSchedulerCard;
 
         private SeekBarCardView.DSeekBarCardView mTempLimitCard;
 
-        private SwitchCompatCardItem.DSwitchCompatCard mCpuBoostEnableCard;
-        private SwitchCompatCardItem.DSwitchCompatCard mCpuBoostDebugMaskCard;
+        private SwitchCardItem.DSwitchCard mCpuBoostEnableCard;
+        private SwitchCardItem.DSwitchCard mCpuBoostDebugMaskCard;
         private SeekBarCardView.DSeekBarCardView mCpuBoostMsCard;
         private PopupCardItem.DPopupCard mCpuBoostSyncThresholdCard;
         private SeekBarCardView.DSeekBarCardView mCpuBoostInputMsCard;
@@ -133,11 +125,9 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
         @Override
         public void initCardView(Bundle savedInstanceState) {
             usageInit();
+            if (CPU.getFreqs() != null) coreInit();
             if (CPU.hasTemp()) tempInit();
-            if (CPU.getFreqs() != null) {
-                coreInit();
-                freqInit();
-            }
+            if (CPU.getFreqs() != null) freqInit();
             governorInit();
             if (CPU.hasMcPowerSaving()) mcPowerSavingInit();
             if (CPU.hasPowerSavingWq()) powerSavingWqInit();
@@ -154,32 +144,24 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
             getHandler().post(cpuUsage);
         }
 
-        private void tempInit() {
-            mTempCard = new CardViewItem.DCardView();
-            mTempCard.setTitle(getString(R.string.cpu_temp));
-            mTempCard.setDescription(CPU.getTemp());
-
-            addView(mTempCard);
-        }
-
         private void coreInit() {
             LinearLayout layout = new LinearLayout(getActivity());
             layout.setOrientation(LinearLayout.VERTICAL);
 
-            mCoreCheckBox = new CheckBox[CPU.getCoreCount()];
+            mCoreCheckBox = new AppCompatCheckBox[CPU.getCoreCount()];
             mCoreProgressBar = new ProgressBar[mCoreCheckBox.length];
-            mCoreFreqText = new TextView[mCoreCheckBox.length];
+            mCoreFreqText = new AppCompatTextView[mCoreCheckBox.length];
             for (int i = 0; i < mCoreCheckBox.length; i++) {
                 View view = inflater.inflate(R.layout.coreview, container, false);
 
-                mCoreCheckBox[i] = (CheckBox) view.findViewById(R.id.checkbox);
+                mCoreCheckBox[i] = (AppCompatCheckBox) view.findViewById(R.id.checkbox);
                 mCoreCheckBox[i].setText(getString(R.string.core, i + 1));
                 mCoreCheckBox[i].setOnClickListener(this);
 
                 mCoreProgressBar[i] = (ProgressBar) view.findViewById(R.id.progressbar);
                 mCoreProgressBar[i].setMax(CPU.getFreqs().size());
 
-                mCoreFreqText[i] = (TextView) view.findViewById(R.id.freq);
+                mCoreFreqText[i] = (AppCompatTextView) view.findViewById(R.id.freq);
 
                 layout.addView(view);
             }
@@ -189,6 +171,14 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
             coreCard.setView(layout);
 
             addView(coreCard);
+        }
+
+        private void tempInit() {
+            mTempCard = new CardViewItem.DCardView();
+            mTempCard.setTitle(getString(R.string.cpu_temp));
+            mTempCard.setDescription(CPU.getTemp());
+
+            addView(mTempCard);
         }
 
         private void freqInit() {
@@ -252,10 +242,10 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
         }
 
         private void powerSavingWqInit() {
-            mPowerSavingWqCard = new SwitchCompatCardItem.DSwitchCompatCard();
+            mPowerSavingWqCard = new SwitchCardItem.DSwitchCard();
             mPowerSavingWqCard.setDescription(getString(R.string.power_saving_wq));
             mPowerSavingWqCard.setChecked(CPU.isPowerSavingWqActive());
-            mPowerSavingWqCard.setOnDSwitchCompatCardListener(this);
+            mPowerSavingWqCard.setOnDSwitchCardListener(this);
 
             addView(mPowerSavingWqCard);
         }
@@ -283,20 +273,20 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
         private void cpuBoostInit() {
             List<DAdapter.DView> views = new ArrayList<>();
             if (CPU.hasCpuBoostEnable()) {
-                mCpuBoostEnableCard = new SwitchCompatCardItem.DSwitchCompatCard();
+                mCpuBoostEnableCard = new SwitchCardItem.DSwitchCard();
                 mCpuBoostEnableCard.setDescription(getString(R.string.cpu_boost));
                 mCpuBoostEnableCard.setChecked(CPU.isCpuBoostActive());
-                mCpuBoostEnableCard.setOnDSwitchCompatCardListener(this);
+                mCpuBoostEnableCard.setOnDSwitchCardListener(this);
 
                 views.add(mCpuBoostEnableCard);
             }
 
             if (CPU.hasCpuBoostDebugMask()) {
-                mCpuBoostDebugMaskCard = new SwitchCompatCardItem.DSwitchCompatCard();
+                mCpuBoostDebugMaskCard = new SwitchCardItem.DSwitchCard();
                 mCpuBoostDebugMaskCard.setTitle(getString(R.string.debug_mask));
                 mCpuBoostDebugMaskCard.setDescription(getString(R.string.debug_mask_summary));
                 mCpuBoostDebugMaskCard.setChecked(CPU.isCpuBoostDebugMaskActive());
-                mCpuBoostDebugMaskCard.setOnDSwitchCompatCardListener(this);
+                mCpuBoostDebugMaskCard.setOnDSwitchCardListener(this);
 
                 views.add(mCpuBoostDebugMaskCard);
             }
@@ -421,20 +411,18 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
         }
 
         @Override
-        public void onChecked(SwitchCompatCardItem.DSwitchCompatCard dSwitchCompatCard, boolean checked) {
-            if (dSwitchCompatCard == mCpuBoostEnableCard)
+        public void onChecked(SwitchCardItem.DSwitchCard dSwitchCard, boolean checked) {
+            if (dSwitchCard == mCpuBoostEnableCard)
                 CPU.activateCpuBoost(checked, getActivity());
-            else if (dSwitchCompatCard == mCpuBoostDebugMaskCard)
+            else if (dSwitchCard == mCpuBoostDebugMaskCard)
                 CPU.activateCpuBoostDebugMask(checked, getActivity());
-            else if (dSwitchCompatCard == mPowerSavingWqCard)
+            else if (dSwitchCard == mPowerSavingWqCard)
                 CPU.activatePowerSavingWq(checked, getActivity());
         }
 
         @Override
         public boolean onRefresh() {
             String MHZ = getString(R.string.mhz);
-
-            if (mTempCard != null) mTempCard.setDescription(CPU.getTemp());
 
             if (mCoreCheckBox != null)
                 for (int i = 0; i < mCoreCheckBox.length; i++) {
@@ -446,6 +434,7 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
                         mCoreFreqText[i].setText(cur == 0 ? getString(R.string.offline) : cur / 1000 + MHZ);
                 }
 
+            if (mTempCard != null) mTempCard.setDescription(CPU.getTemp());
             if (mMaxFreqCard != null)
                 mMaxFreqCard.setItem(CPU.getMaxFreq(0) / 1000 + MHZ);
             if (mMinFreqCard != null)
@@ -489,6 +478,11 @@ public class CPUFragment extends ViewPagerFragment implements Constants {
     }
 
     public static class GovernorPart extends PathReaderFragment {
+
+        @Override
+        public String getName() {
+            return CPU.getCurGovernor(0);
+        }
 
         @Override
         public String getPath() {

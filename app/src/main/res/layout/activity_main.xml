@@ -20,11 +20,11 @@
                 android:id="@+id/toolbar"
                 android:layout_height="?attr/actionBarSize"
                 android:layout_width="match_parent"
-                android:background="?attr/colorPrimary"
+                android:background="@color/actionbar_color"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
                 app:contentInsetLeft="72dp"
                 app:contentInsetStart="72dp"
-                app:theme="@style/ActionBarStyle" />
+                android:theme="@style/ActionBarStyle" />
 
             <FrameLayout
                 android:id="@+id/content_frame"
