@@ -36,6 +36,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import com.grarak.kerneladiutor.R;
 import com.grarak.kerneladiutor.elements.DAdapter;
@@ -63,6 +64,7 @@ public abstract class RecyclerViewFragment extends BaseFragment implements IRecy
     private final List<DAdapter.DView> views = new ArrayList<>();
     protected RecyclerView recyclerView;
     protected View applyOnBootLayout;
+    protected TextView applyOnBootText;
     protected SwitchCompat applyOnBootView;
     private DAdapter.Adapter adapter;
     private StaggeredGridLayoutManager layoutManager;
@@ -96,8 +98,8 @@ public abstract class RecyclerViewFragment extends BaseFragment implements IRecy
             }
         });
         setRecyclerView(recyclerView);
-        int padding = (int) (2.5 * getResources().getDisplayMetrics().density);
-        recyclerView.setPadding(padding, padding, padding, padding);
+        int padding = getResources().getDimensionPixelSize(R.dimen.recyclerview_padding);
+        recyclerView.setPadding(padding, 0, padding, 0);
 
         if (Utils.getBoolean("hideapplyonboot", true, getActivity()))
             recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -170,6 +172,7 @@ public abstract class RecyclerViewFragment extends BaseFragment implements IRecy
                 });
             }
 
+            applyOnBootText = (TextView) view.findViewById(R.id.apply_on_boot_text);
             applyOnBootLayout = view.findViewById(R.id.apply_on_boot_layout);
             if (applyOnBootLayout != null) {
                 onScrollDisappearView = applyOnBootLayout;
@@ -187,7 +190,7 @@ public abstract class RecyclerViewFragment extends BaseFragment implements IRecy
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (backgroundView != null) backgroundView.setVisibility(View.INVISIBLE);
             if (fabView != null) {
-                fabView.setElevation(getResources().getDisplayMetrics().density * 500);
+                fabView.setElevation(getResources().getDimensionPixelSize(R.dimen.fab_elevation));
                 fabView.setVisibility(View.INVISIBLE);
             }
         }
@@ -198,7 +201,7 @@ public abstract class RecyclerViewFragment extends BaseFragment implements IRecy
         if (!showApplyOnBoot()) showApplyOnBoot(false);
 
         showOnScrollDisappear();
-        new CardViewTask().execute(savedInstanceState);
+        new CardViewTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, savedInstanceState);
 
         return view;
     }
@@ -234,7 +237,7 @@ public abstract class RecyclerViewFragment extends BaseFragment implements IRecy
     public void addView(DAdapter.DView view) {
         if (views.indexOf(view) < 0) {
             views.add(view);
-            adapter.notifyDataSetChanged();
+            adapter.notifyItemInserted(views.indexOf(view));
         }
     }
 
@@ -242,7 +245,7 @@ public abstract class RecyclerViewFragment extends BaseFragment implements IRecy
         int position = views.indexOf(view);
         if (position > -1) {
             views.remove(position);
-            adapter.notifyDataSetChanged();
+            adapter.notifyItemRemoved(position);
         }
     }
 
@@ -380,15 +383,16 @@ public abstract class RecyclerViewFragment extends BaseFragment implements IRecy
             } catch (NullPointerException ignored) {
             }
             try {
-                if (isAdded()) postInitCardView(savedInstanceState);
+                if (isAdded()) {
+                    postInitCardView(savedInstanceState);
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                        if (backgroundView != null) Utils.circleAnimate(backgroundView, 0, 0);
+                        if (fabView != null)
+                            Utils.circleAnimate(fabView, fabView.getWidth() / 2, fabView.getHeight() / 2);
+                    }
+                }
             } catch (IllegalStateException e) {
                 e.printStackTrace();
-            }
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                if (backgroundView != null) Utils.circleAnimate(backgroundView, 0, 0);
-                if (fabView != null)
-                    Utils.circleAnimate(fabView, fabView.getWidth() / 2, fabView.getHeight() / 2);
             }
         }
     }
