@@ -19,6 +19,7 @@ package com.grarak.kerneladiutor.fragments;
 import android.content.res.Configuration;
 import android.graphics.LightingColorFilter;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v7.app.ActionBar;
@@ -34,6 +35,7 @@ import android.view.ViewGroup;
 import android.view.animation.AnimationUtils;
 import android.widget.CompoundButton;
 import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import com.grarak.kerneladiutor.R;
 import com.grarak.kerneladiutor.elements.DAdapter;
@@ -64,6 +66,9 @@ public abstract class RecyclerViewFragment extends BaseFragment implements IRecy
     protected SwitchCompat applyOnBootView;
     private DAdapter.Adapter adapter;
     private StaggeredGridLayoutManager layoutManager;
+    protected View backgroundView;
+    protected View fabView;
+    protected View onScrollDisappearView;
     private Handler hand;
 
     @Override
@@ -91,7 +96,65 @@ public abstract class RecyclerViewFragment extends BaseFragment implements IRecy
             }
         });
         setRecyclerView(recyclerView);
-        recyclerView.setPadding(5, 5, 5, 5);
+        int padding = (int) (2.5 * getResources().getDisplayMetrics().density);
+        recyclerView.setPadding(padding, padding, padding, padding);
+
+        if (Utils.getBoolean("hideapplyonboot", true, getActivity()))
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                private int scrollMargin = 5;
+                private boolean changing;
+
+                @Override
+                public void onScrolled(RecyclerView recyclerView, int dx, final int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+
+                    if (changing || onScrollDisappearView == null) return;
+                    int y = dy;
+                    if (y < 0) y *= -1;
+                    if (y < 5) return;
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            changing = true;
+                            int actionBarHeight = Utils.getActionBarHeight(getActivity());
+                            for (int i = 0; i <= actionBarHeight / scrollMargin; i++) {
+                                try {
+                                    RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams)
+                                            onScrollDisappearView.getLayoutParams();
+
+                                    int margin = params.topMargin;
+                                    if (dy < 0 && margin < 0)
+                                        margin += scrollMargin;
+                                    else if (dy > 0 && margin > -actionBarHeight)
+                                        margin -= scrollMargin;
+
+                                    if (margin >= 0) margin = 0;
+                                    if (margin <= -actionBarHeight + scrollMargin)
+                                        margin = -actionBarHeight + 1;
+
+                                    params.topMargin = margin;
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            onScrollDisappearView.requestLayout();
+                                        }
+                                    });
+
+                                    Thread.sleep(5);
+                                } catch (InterruptedException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                            try {
+                                Thread.sleep(100);
+                                changing = false;
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }).start();
+                }
+            });
 
         if (showApplyOnBoot()) {
             applyOnBootView = (SwitchCompat) view.findViewById(R.id.apply_on_boot_view);
@@ -100,7 +163,7 @@ public abstract class RecyclerViewFragment extends BaseFragment implements IRecy
                 applyOnBootView.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        Utils.saveBoolean(getClass().getSimpleName() + "onboot", isChecked, getActivity());
+                        Utils.saveBoolean(getClassName() + "onboot", isChecked, getActivity());
                         Utils.toast(getString(isChecked ? R.string.apply_on_boot_enabled : R.string.apply_on_boot_disabled,
                                 getActionBar().getTitle()), getActivity());
                     }
@@ -109,6 +172,7 @@ public abstract class RecyclerViewFragment extends BaseFragment implements IRecy
 
             applyOnBootLayout = view.findViewById(R.id.apply_on_boot_layout);
             if (applyOnBootLayout != null) {
+                onScrollDisappearView = applyOnBootLayout;
                 applyOnBootLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -118,11 +182,22 @@ public abstract class RecyclerViewFragment extends BaseFragment implements IRecy
             }
         }
 
+        backgroundView = view.findViewById(R.id.background_view);
+        fabView = view.findViewById(R.id.fab_view);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (backgroundView != null) backgroundView.setVisibility(View.INVISIBLE);
+            if (fabView != null) {
+                fabView.setElevation(getResources().getDisplayMetrics().density * 500);
+                fabView.setVisibility(View.INVISIBLE);
+            }
+        }
+
         progressBar = new ProgressBar(getActivity());
         setProgressBar(progressBar);
 
         if (!showApplyOnBoot()) showApplyOnBoot(false);
 
+        showOnScrollDisappear();
         new CardViewTask().execute(savedInstanceState);
 
         return view;
@@ -137,7 +212,7 @@ public abstract class RecyclerViewFragment extends BaseFragment implements IRecy
     }
 
     public String getClassName() {
-        return getClass().getSimpleName();
+       return getClass().getSimpleName();
     }
 
     public void setRecyclerView(RecyclerView recyclerView) {
@@ -196,6 +271,16 @@ public abstract class RecyclerViewFragment extends BaseFragment implements IRecy
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         layoutManager.setSpanCount(getSpan());
+        showOnScrollDisappear();
+    }
+
+    private void showOnScrollDisappear() {
+        if (onScrollDisappearView != null) {
+            RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) onScrollDisappearView
+                    .getLayoutParams();
+            layoutParams.topMargin = 0;
+            onScrollDisappearView.requestLayout();
+        }
     }
 
     public ActionBar getActionBar() {
@@ -298,6 +383,12 @@ public abstract class RecyclerViewFragment extends BaseFragment implements IRecy
                 if (isAdded()) postInitCardView(savedInstanceState);
             } catch (IllegalStateException e) {
                 e.printStackTrace();
+            }
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                if (backgroundView != null) Utils.circleAnimate(backgroundView, 0, 0);
+                if (fabView != null)
+                    Utils.circleAnimate(fabView, fabView.getWidth() / 2, fabView.getHeight() / 2);
             }
         }
     }
