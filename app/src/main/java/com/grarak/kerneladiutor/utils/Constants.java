@@ -16,7 +16,7 @@
 
 package com.grarak.kerneladiutor.utils;
 
-import com.grarak.kerneladiutor.elements.ListAdapter;
+import com.grarak.kerneladiutor.elements.DAdapter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,10 +27,10 @@ import java.util.List;
 public interface Constants {
 
     String TAG = "KernelAdiutor";
-    String VERSION_NAME = "0.8.9.2";
+    String VERSION_NAME = "prebuilt";
     String PREF_NAME = "prefs";
     String GAMMA_URL = "https://raw.githubusercontent.com/Grarak/KernelAdiutor/master/gamma_profiles.json";
-    List<ListAdapter.ListItem> ITEMS = new ArrayList<>();
+    List<DAdapter.DView> ITEMS = new ArrayList<>();
 
     // Kernel Informations
     String PROC_VERSION = "/proc/version";
@@ -535,9 +535,14 @@ public interface Constants {
     String SMB135X_WAKELOCK = "/sys/module/smb135x_charger/parameters/use_wlock";
     String SENSOR_IND_WAKELOCK = "/sys/module/wakeup/parameters/enable_si_ws";
     String MSM_HSIC_HOST_WAKELOCK = "/sys/module/wakeup/parameters/enable_msm_hsic_ws";
+    String WLAN_RX_WAKELOCK = "/sys/module/wakeup/parameters/wlan_rx_wake";
+    String WLAN_CTRL_WAKELOCK = "/sys/module/wakeup/parameters/wlan_ctrl_wake";
+    String WLAN_WAKELOCK = "/sys/module/wakeup/parameters/wlan_wake";
+    String WLAN_RX_WAKELOCK_DIVIDER = "/sys/module/bcmdhd/parameters/wl_divide";
+    String MSM_HSIC_WAKELOCK_DIVIDER = "/sys/module/xhci_hcd/parameters/wl_divide";
 
     // Logging
-    String LOGGER_ENABLED = "/sys/module/logger/parameters/enabled";
+    String LOGGER_ENABLED = "/sys/module/logger/parameters/log_enabled";
 
     // SELinux
     String SELINUX = "selinux";
@@ -556,9 +561,9 @@ public interface Constants {
     String TCP_AVAILABLE_CONGESTIONS = "/proc/sys/net/ipv4/tcp_available_congestion_control";
     String HOSTNAME_KEY = "net.hostname";
 
-    String[][] MISC_ARRAY = {{SMB135X_WAKELOCK, SENSOR_IND_WAKELOCK, MSM_HSIC_HOST_WAKELOCK,
-            LOGGER_ENABLED, FSYNC, SELINUX, DYNAMIC_FSYNC, POWER_SUSPEND_MODE, POWER_SUSPEND_STATE, TCP_AVAILABLE_CONGESTIONS, HOSTNAME_KEY},
-            VIBRATION_ARRAY};
+    String[][] MISC_ARRAY = {{SMB135X_WAKELOCK, SENSOR_IND_WAKELOCK, MSM_HSIC_HOST_WAKELOCK, WLAN_RX_WAKELOCK, WLAN_CTRL_WAKELOCK,
+            WLAN_WAKELOCK, WLAN_RX_WAKELOCK_DIVIDER, MSM_HSIC_WAKELOCK_DIVIDER, LOGGER_ENABLED, FSYNC, SELINUX, DYNAMIC_FSYNC,
+            POWER_SUSPEND_MODE, POWER_SUSPEND_STATE, TCP_AVAILABLE_CONGESTIONS, HOSTNAME_KEY}, VIBRATION_ARRAY};
 
     // Build prop
     String BUILD_PROP = "/system/build.prop";
