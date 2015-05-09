@@ -16,6 +16,11 @@
 
 package com.grarak.kerneladiutor.utils.root;
 
+import com.grarak.kerneladiutor.utils.Utils;
+
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by willi on 08.02.15.
  */
@@ -35,6 +40,10 @@ public class RootFile {
         RootUtils.runCommand("mkdir -p " + file);
     }
 
+    public void mv(String newPath) {
+        RootUtils.runCommand("mv -f " + file + " " + newPath);
+    }
+
     public void write(String text, boolean append) {
         RootUtils.runCommand(append ? "echo '" + text + "' >> " + file : "echo '" + text + "' > " + file);
     }
@@ -43,8 +52,15 @@ public class RootFile {
         RootUtils.runCommand("rm -rf " + file);
     }
 
-    public String[] list() {
-        return RootUtils.runCommand("ls " + file).split("\\r?\\n");
+    public List<String> list() {
+        String[] files = RootUtils.runCommand("ls " + file).split("\\r?\\n");
+        List<String> list = new ArrayList<>();
+
+        // Make sure the file exists
+        for (String file : files)
+            if (file != null && !file.isEmpty() && Utils.existFile(this.file + "/" + file))
+                list.add(file);
+        return list;
     }
 
     public boolean exists() {

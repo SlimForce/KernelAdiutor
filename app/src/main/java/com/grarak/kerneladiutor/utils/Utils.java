@@ -52,6 +52,8 @@ import com.grarak.kerneladiutor.utils.root.RootFile;
 import com.grarak.kerneladiutor.utils.root.RootUtils;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -175,7 +177,7 @@ public class Utils implements Constants {
     }
 
     public static void vibrate(int duration) {
-        RootUtils.runCommand("echo " + duration + " > " + VIBRATION_ENABLE);
+        RootUtils.runCommand("echo " + duration + " > /sys/class/timed_output/vibrator/enable");
     }
 
     public static List<String> getApplys(Class mClass) {
@@ -298,10 +300,20 @@ public class Utils implements Constants {
         return RootUtils.runCommand("getprop " + key);
     }
 
-    public static boolean isServiceActive(String service) {
-        String output = RootUtils.runCommand("echo `ps | grep " + service + " | grep -v \"grep "
-                + service + "\" | awk '{print $1}'`");
-        return output != null && output.length() > 0;
+    public static boolean isPropActive(String key) {
+        try {
+            return RootUtils.runCommand("getprop | grep " + key).split("]:")[1].contains("running");
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    public static boolean hasProp(String key) {
+        try {
+            return RootUtils.runCommand("getprop | grep " + key).split("]:").length > 1;
+        } catch (Exception ignored) {
+            return false;
+        }
     }
 
     public static void writeFile(String path, String text, boolean append) {
@@ -315,12 +327,33 @@ public class Utils implements Constants {
         }
     }
 
+    public static String readFile(String file, boolean root) {
+        if (root) return new RootFile(file).readFile();
+        try {
+            FileReader fileReader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            StringBuilder stringBuilder = new StringBuilder();
+            String line;
+            while ((line = bufferedReader.readLine()) != null)
+                stringBuilder.append(line).append("\n");
+            bufferedReader.close();
+            fileReader.close();
+            return stringBuilder.toString().trim();
+        } catch (FileNotFoundException ignored) {
+            Log.e(TAG, "File does not exist " + file);
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Failed to read " + file);
+        }
+        return null;
+    }
+
     public static boolean existFile(String file) {
         return new RootFile(file).exists();
     }
 
     public static String readFile(String file) {
-        return new RootFile(file).readFile();
+        return readFile(file, true);
     }
 
 }

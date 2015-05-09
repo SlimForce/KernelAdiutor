@@ -194,6 +194,8 @@ public class MainActivity extends AppCompatActivity implements Constants {
             ITEMS.add(new DAdapter.Item(getString(R.string.cpu_voltage), new CPUVoltageFragment()));
         if (CPUHotplug.hasCpuHotplug())
             ITEMS.add(new DAdapter.Item(getString(R.string.cpu_hotplug), new CPUHotplugFragment()));
+        //if (Thermal.hasThermal())
+        //    ITEMS.add(new DAdapter.Item(getString(R.string.thermal), new ThermalFragment()));
         if (GPU.hasGpuControl())
             ITEMS.add(new DAdapter.Item(getString(R.string.gpu), new GPUFragment()));
         if (Screen.hasScreen())
@@ -391,7 +393,8 @@ public class MainActivity extends AppCompatActivity implements Constants {
         int actionBarSize = Utils.getActionBarHeight(this);
         if (Utils.getScreenOrientation(this) == Configuration.ORIENTATION_LANDSCAPE) {
             params.width = width / 2;
-            if (tablet) params.width -= actionBarSize + 30;
+            if (tablet)
+                params.width -= actionBarSize + (35 * getResources().getDisplayMetrics().density);
         } else params.width = tablet ? width / 2 : width - actionBarSize;
 
         return params;

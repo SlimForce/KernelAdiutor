@@ -14,35 +14,35 @@
  * limitations under the License.
  */
 
-package com.grarak.kerneladiutor.utils.tools;
+package com.grarak.kerneladiutor.utils.kernel;
+
+import android.content.Context;
 
 import com.grarak.kerneladiutor.utils.Constants;
 import com.grarak.kerneladiutor.utils.Utils;
-import com.grarak.kerneladiutor.utils.root.RootFile;
-import com.grarak.kerneladiutor.utils.root.RootUtils;
-
-import java.util.List;
+import com.grarak.kerneladiutor.utils.root.Control;
 
 /**
- * Created by willi on 25.04.15.
+ * Created by willi on 03.05.15.
  */
-public class Initd implements Constants {
+public class Thermal implements Constants {
 
-    public static String execute(String file) {
-        return RootUtils.runCommand(INITD + "/" + file);
+    public static void activateThermald(boolean active, Context context) {
+        if (active) Control.startService(THERMALD, true, context);
+        else Control.stopService(THERMALD, true, context);
     }
 
-    public static String getInitd(String file) {
-        return Utils.readFile(INITD + "/" + file);
+    public static boolean isThermaldActive() {
+        return Utils.isPropActive(THERMALD);
     }
 
-    public static List<String> getInitds() {
-        RootFile initd = new RootFile(INITD);
-        if (!initd.exists()) {
-            RootUtils.mount(true, "/system");
-            initd.mkdir();
-        }
-        return initd.list();
+    public static boolean hasThermald() {
+        return Utils.hasProp(THERMALD);
+    }
+
+    public static boolean hasThermal() {
+        if (hasThermald()) return true;
+        return false;
     }
 
 }

@@ -8,6 +8,8 @@
     <string name="cancel">Cancel</string>
     <string name="current_value_not_supported">Current value is not supported</string>
     <string name="beta_message">Thank you for being a beta tester! If you get any problems, please don\'t hesitate contacting me. You are currently running version %s.</string>
+    <string name="select_picture">Select Picture</string>
+    <string name="default_picture">Default Picture</string>
 
     <!-- FileBrowser -->
     <string name="select_file">Select %s?</string>
@@ -46,6 +48,7 @@
     <string name="cpu">CPU</string>
     <string name="cpu_voltage">CPU Voltage</string>
     <string name="cpu_hotplug">CPU Hotplug</string>
+    <string name="thermal">Thermal</string>
     <string name="gpu">GPU</string>
     <string name="screen">Screen</string>
     <string name="wake_controls">Wake Controls</string>
@@ -219,6 +222,11 @@
     <string name="sampling_rate">Sampling Rate</string>
     <string name="cpu_down_rate">CPU Down Rate</string>
     <string name="cpu_up_rate">CPU Up Rate</string>
+
+    <!-- Thermal -->
+    <string name="thermal_info">Use only one thermal driver from the following options, using more than at the same time may cause unexpected behavior.</string>
+    <string name="thermald">Thermald</string>
+    <string name="thermald_summary">Stock Qualcomm thermal driver that prevents device from overheating. This should be disabled if current kernel has an alternative.</string>
 
     <!-- GPU -->
     <string name="gpu_2d_cur_freq">GPU 2D Current Frequency</string>
@@ -526,8 +534,6 @@
     <string name="feature_request_summary">Do you want more features? Open a new issue on Github and tell me your idea.</string>
     <string name="google_plus">Google Plus</string>
     <string name="google_plus_summary">Join our community.</string>
-    <string name="donate">Donate</string>
-    <string name="donate_summary">I write this application during my free time. You would make me really happy if you donated me a few bucks. I don\'t force you to donate anything. This application will stay free and I won\'t charge you to unlock any features!</string>
     <string name="translation">Translation</string>
     <string name="translation_summary">Help me to translate this app!</string>
 
